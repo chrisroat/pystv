@@ -3,3 +3,5 @@
 __author__ = """Chris Roat"""
 __email__ = "chris.roat@gmail.com"
 __version__ = "0.0.5"
+
+from .pystv import run_stv  # noqa

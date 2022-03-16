@@ -2,26 +2,44 @@
 
 """Tests for `pystv` package."""
 
-import pytest
 from click.testing import CliRunner
+from numpy.testing import assert_equal
 
+import pystv
 from pystv import cli
 
 
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
+def test_2cands_1seat():
+    ballots = [
+        [2, 1],
+        [2, 1],
+        [1, 2],
+    ]
+    results = pystv.run_stv(ballots, num_seats=1)
+    assert_equal(results[0], [False, True])
+    assert_equal(results[1], [0, 1, 2])
 
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+
+def test_2cands_1seat_undervote():
+    ballots = [
+        [2, 0],
+        [2, 1],
+        [1, 2],
+    ]
+    results = pystv.run_stv(ballots, num_seats=1)
+    assert_equal(results[0], [False, True])
+    assert_equal(results[1], [0, 1, 2])
 
 
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
+def test_3cands_2seats():
+    ballots = [
+        [2, 1, 3],
+        [2, 1, 3],
+        [1, 2, 3],
+    ]
+    results = pystv.run_stv(ballots, num_seats=2)
+    assert_equal(results[0], [True, True, False])
+    assert_equal(results[1], [0, 1, 2, 0])
 
 
 def test_command_line_interface():
