@@ -5,9 +5,11 @@ Single Transferable Vote
 
 .. image:: https://img.shields.io/pypi/v/pystv.svg
         :target: https://pypi.python.org/pypi/pystv
+        :alt: PyPi Status
 
-.. image:: https://img.shields.io/travis/chrisroat/pystv.svg
-        :target: https://travis-ci.com/chrisroat/pystv
+.. image:: https://github.com/chrisroat/pystv/actions/workflows/ci.yml/badge.svg
+        :target: https://github.com/chrisroat/pystv/actions/workflows/ci.yml
+        :alt: Test Status
 
 .. image:: https://readthedocs.org/projects/pystv/badge/?version=latest
         :target: https://pystv.readthedocs.io/en/latest/?version=latest
@@ -16,8 +18,7 @@ Single Transferable Vote
 
 .. image:: https://pyup.io/repos/github/chrisroat/pystv/shield.svg
      :target: https://pyup.io/repos/github/chrisroat/pystv/
-     :alt: Updates
-
+     :alt: Security Status
 
 
 Python API for adjudicating single transferable vote elections
