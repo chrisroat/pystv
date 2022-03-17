@@ -16,7 +16,7 @@ def test_2cands_1seat():
         [1, 2],
     ]
     results = pystv.run_stv(ballots, num_seats=1)
-    assert_equal(results[0], [False, True])
+    assert_equal(results[0], [2])
     assert_equal(results[1], [0, 1, 2])
 
 
@@ -27,7 +27,18 @@ def test_2cands_1seat_undervote():
         [1, 2],
     ]
     results = pystv.run_stv(ballots, num_seats=1)
-    assert_equal(results[0], [False, True])
+    assert_equal(results[0], [2])
+    assert_equal(results[1], [0, 1, 2])
+
+
+def test_2cands_1seat_initial_undervote():
+    ballots = [
+        [0, 2],
+        [2, 1],
+        [1, 2],
+    ]
+    results = pystv.run_stv(ballots, num_seats=1)
+    assert_equal(results[0], [2])
     assert_equal(results[1], [0, 1, 2])
 
 
@@ -38,8 +49,21 @@ def test_3cands_2seats():
         [1, 2, 3],
     ]
     results = pystv.run_stv(ballots, num_seats=2)
-    assert_equal(results[0], [True, True, False])
+    assert_equal(results[0], [1, 2])
     assert_equal(results[1], [0, 1, 2, 0])
+
+
+def test_3cands_1seat_multiround():
+    ballots = [
+        [1, 2, 3],
+        [1, 2, 3],
+        [2, 1, 3],
+        [2, 1, 3],
+        [3, 1, 2],
+    ]
+    results = pystv.run_stv(ballots, num_seats=1)
+    assert_equal(results[0], [1])
+    assert_equal(results[1], [0, 3, 2, 0])
 
 
 def test_command_line_interface():

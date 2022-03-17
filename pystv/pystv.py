@@ -4,7 +4,7 @@ import numpy as np
 
 
 def run_stv(ballots, num_seats):
-    ballots = np.asarray(ballots)
+    ballots = validate_and_standardize_ballots(ballots)
 
     weights = np.zeros(ballots.shape, dtype=np.float32)
     weights[:, 0] = 1
@@ -14,6 +14,10 @@ def run_stv(ballots, num_seats):
     num_cands = np.max(ballots)
 
     while True:
+        empty_mask = ballots[:, 0] == 0
+        ballots[empty_mask, :-1] = ballots[empty_mask, 1:]
+        ballots[empty_mask, -1] = 0
+
         counts = np.bincount(
             ballots.ravel(), weights=weights.ravel(), minlength=num_cands + 1
         )
@@ -22,4 +26,15 @@ def run_stv(ballots, num_seats):
         if elected.sum() == num_seats:
             break
 
+        losers = np.where(counts[1:] == counts[1:].min())[0] + 1
+        loser = np.random.choice(losers, 1)
+
+        ballots[ballots == loser] = 0
+
+    elected = np.nonzero(elected)[0] + 1
+
     return elected, counts
+
+
+def validate_and_standardize_ballots(ballots):
+    return np.asarray(ballots)
