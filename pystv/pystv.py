@@ -9,7 +9,7 @@ def run_stv(ballots, num_seats):
     weights = np.zeros(ballots.shape, dtype=np.float32)
     weights[:, 0] = 1
 
-    votes_needed = ballots.shape[0] / (num_seats + 1)
+    votes_needed = int(1 + ballots.shape[0] / (num_seats + 1))
 
     num_cands = np.max(ballots)
 
