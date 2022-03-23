@@ -1,7 +1,6 @@
-#!/usr/bin/env python
-
 """Tests for `pystv` package."""
-
+import numpy as np
+import pytest
 from click.testing import CliRunner
 from numpy.testing import assert_equal
 
@@ -23,17 +22,6 @@ def test_2cands_1seat():
 def test_2cands_1seat_undervote():
     ballots = [
         [2, 0],
-        [2, 1],
-        [1, 2],
-    ]
-    results = pystv.run_stv(ballots, num_seats=1)
-    assert_equal(results[0], [2])
-    assert_equal(results[1], [0, 1, 2])
-
-
-def test_2cands_1seat_initial_undervote():
-    ballots = [
-        [0, 2],
         [2, 1],
         [1, 2],
     ]
@@ -83,6 +71,34 @@ def test_3cands_2seats_multiround():
     results = pystv.run_stv(ballots, num_seats=2)
     assert_equal(results[0], [2, 3])
     assert_equal(results[1], [0, 0, 4, 5])
+
+
+def test_validate_and_standardize_ballots_ok():
+    ballots = [
+        [1, 0, 0],
+        [1, 2, 0],
+        [1, 2, 3],
+    ]
+    pystv.validate_and_standardize_ballots(ballots)
+
+
+def test_validate_and_standardize_ballots_negative():
+    ballots = [[1, 0, 0], [1, 2, -1], [1, 2, 3]]
+    with pytest.raises(ValueError, match=r"Negative rankings on ballots: \[1\]"):
+        pystv.validate_and_standardize_ballots(ballots)
+
+
+@pytest.mark.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
+def test_validate_and_standardize_ballots_ragged():
+    ballots = [[1, 0, 0], [1, 2], [1, 2, 3]]
+    with pytest.raises(ValueError, match=r"Ballot data has wrong dim"):
+        pystv.validate_and_standardize_ballots(ballots)
+
+
+def test_validate_and_standardize_ballots_invalid_ranking():
+    ballots = [[1, 0, 0], [0, 1, 0], [1, 2, 0], [0, 0, 1]]
+    with pytest.raises(ValueError, match=r"Skipped rankings on ballots: \[1, 3\]"):
+        pystv.validate_and_standardize_ballots(ballots)
 
 
 def test_command_line_interface():

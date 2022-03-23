@@ -37,4 +37,24 @@ def run_stv(ballots, num_seats):
 
 
 def validate_and_standardize_ballots(ballots):
-    return np.asarray(ballots)
+    ballots = np.asarray(ballots)
+
+    if ballots.ndim != 2:
+        raise ValueError("Ballot data has wrong dim: %s" % ballots.ndim)
+
+    non_negative_rankings = ballots >= 0
+    if not non_negative_rankings.all():
+        bad_ballots = ~non_negative_rankings.all(axis=1)
+        bad_indices = np.nonzero(bad_ballots)[0].tolist()
+        raise ValueError("Negative rankings on ballots: %s" % bad_indices)
+
+    first = ballots[:, :-1] == 0
+    second = ballots[:, 1:] == 0
+    continuous_rankings = ~first | second
+
+    if not continuous_rankings.all():
+        bad_ballots = ~continuous_rankings.all(axis=1)
+        bad_indices = np.nonzero(bad_ballots)[0].tolist()
+        raise ValueError("Skipped rankings on ballots: %s" % bad_indices)
+
+    return ballots
