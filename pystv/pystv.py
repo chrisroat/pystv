@@ -8,7 +8,7 @@ RoundResult = collections.namedtuple("RoundResults", ["count", "elected", "elimi
 def run_stv(ballots, num_seats):
     ballots = validate_and_standardize_ballots(ballots)
 
-    weights = np.zeros(ballots.shape, dtype=np.float32)
+    weights = np.zeros(ballots.shape, dtype=np.float64)
     weights[:, 0] = 1
 
     votes_needed = int(1 + ballots.shape[0] / (num_seats + 1))
@@ -18,10 +18,6 @@ def run_stv(ballots, num_seats):
     round_info = []
 
     while True:
-        empty_mask = ballots[:, 0] == 0
-        ballots[empty_mask, :-1] = ballots[empty_mask, 1:]
-        ballots[empty_mask, -1] = 0
-
         counts = np.bincount(
             ballots.ravel(), weights=weights.ravel(), minlength=num_cands + 1
         )
@@ -35,11 +31,30 @@ def run_stv(ballots, num_seats):
         min_count = counts[1:].min()
         eliminated = np.where(counts[1:] == min_count)[0] + 1
         eliminated = np.random.choice(eliminated, 1)
-        ballots[ballots == eliminated] = 0
 
         round_info.append(
             RoundResult(counts.tolist(), elected_idx.tolist(), eliminated)
         )
+
+        for col in range(ballots.shape[1]):
+            mask = ballots[:, col] == eliminated
+            ballots[mask, col:-1] = ballots[mask, col + 1 :]
+            ballots[mask, -1] = 0
+
+        for idx in elected_idx:
+            if counts[idx] > votes_needed:
+                adjustment = votes_needed / counts[idx]
+                location = np.nonzero(ballots == idx)
+
+                next_col = np.minimum(location[1] + 1, ballots.shape[1] - 1)
+                next = (location[0], next_col)
+
+                orig = weights[location]
+                updated = orig * adjustment
+                diff = orig - updated
+
+                weights[location] = updated
+                weights[next] = diff
 
 
 def elected_indices(e):

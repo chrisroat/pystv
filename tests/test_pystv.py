@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 from click.testing import CliRunner
-from numpy.testing import assert_equal
+from numpy.testing import assert_equal, assert_allclose
 
 import pystv
 from pystv import cli
@@ -97,7 +97,7 @@ def test_3cands_2seats_multiround_with_adjust():
     results = pystv.run_stv(ballots, num_seats=2)
     assert len(results) == 2
     assert results[0] == RR([0, 2, 5, 3], [2], 1)
-    assert results[1] == RR([0, 0, 5, 5], [2, 3], None)
+    assert results[1] == RR([0, 0, 4, 6.000000000000001], [2, 3], None)
 
 
 def test_validate_and_standardize_ballots_ok():
