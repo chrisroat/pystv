@@ -7,6 +7,8 @@ from numpy.testing import assert_equal
 import pystv
 from pystv import cli
 
+RR = pystv.RoundResult
+
 
 def test_2cands_1seat():
     ballots = [
@@ -15,8 +17,9 @@ def test_2cands_1seat():
         [1, 2],
     ]
     results = pystv.run_stv(ballots, num_seats=1)
-    assert_equal(results[0], [2])
-    assert_equal(results[1], [0, 1, 2])
+
+    assert len(results) == 1
+    assert results[0] == RR([0, 1, 2], [2], None)
 
 
 def test_2cands_1seat_undervote():
@@ -26,8 +29,9 @@ def test_2cands_1seat_undervote():
         [1, 2],
     ]
     results = pystv.run_stv(ballots, num_seats=1)
-    assert_equal(results[0], [2])
-    assert_equal(results[1], [0, 1, 2])
+
+    assert len(results) == 1
+    assert results[0] == RR([0, 1, 2], [2], None)
 
 
 def test_3cands_2seats_1round():
@@ -39,8 +43,9 @@ def test_3cands_2seats_1round():
         [1, 2, 3],
     ]
     results = pystv.run_stv(ballots, num_seats=2)
-    assert_equal(results[0], [1, 2])
-    assert_equal(results[1], [0, 2, 3, 0])
+
+    assert len(results) == 1
+    assert results[0] == RR([0, 2, 3, 0], [1, 2], None)
 
 
 def test_3cands_1seat_multiround():
@@ -52,8 +57,10 @@ def test_3cands_1seat_multiround():
         [3, 1, 2],
     ]
     results = pystv.run_stv(ballots, num_seats=1)
-    assert_equal(results[0], [1])
-    assert_equal(results[1], [0, 3, 2, 0])
+
+    assert len(results) == 2
+    assert results[0] == RR([0, 2, 2, 1], [], 3)
+    assert results[1] == RR([0, 3, 2, 0], [1], None)
 
 
 def test_3cands_2seats_multiround():
@@ -69,8 +76,28 @@ def test_3cands_2seats_multiround():
         [3, 2, 1],
     ]
     results = pystv.run_stv(ballots, num_seats=2)
-    assert_equal(results[0], [2, 3])
-    assert_equal(results[1], [0, 0, 4, 5])
+    assert len(results) == 2
+    assert results[0] == RR([0, 2, 4, 3], [2], 1)
+    assert results[1] == RR([0, 0, 4, 5], [2, 3], None)
+
+
+def test_3cands_2seats_multiround_with_adjust():
+    ballots = [
+        [1, 3, 2],
+        [1, 3, 2],
+        [2, 1, 3],
+        [2, 1, 3],
+        [2, 1, 3],
+        [2, 1, 3],
+        [2, 1, 3],
+        [3, 1, 2],
+        [3, 2, 1],
+        [3, 2, 1],
+    ]
+    results = pystv.run_stv(ballots, num_seats=2)
+    assert len(results) == 2
+    assert results[0] == RR([0, 2, 5, 3], [2], 1)
+    assert results[1] == RR([0, 0, 5, 5], [2, 3], None)
 
 
 def test_validate_and_standardize_ballots_ok():

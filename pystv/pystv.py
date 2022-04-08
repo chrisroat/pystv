@@ -1,6 +1,8 @@
 """Minimalist implementation of Single Transferable Vote."""
-
+import collections
 import numpy as np
+
+RoundResult = collections.namedtuple("RoundResults", ["count", "elected", "eliminated"])
 
 
 def run_stv(ballots, num_seats):
@@ -13,6 +15,8 @@ def run_stv(ballots, num_seats):
 
     num_cands = np.max(ballots)
 
+    round_info = []
+
     while True:
         empty_mask = ballots[:, 0] == 0
         ballots[empty_mask, :-1] = ballots[empty_mask, 1:]
@@ -22,18 +26,25 @@ def run_stv(ballots, num_seats):
             ballots.ravel(), weights=weights.ravel(), minlength=num_cands + 1
         )
         elected = counts[1:] >= votes_needed
+        elected_idx = np.nonzero(elected)[0] + 1
 
         if elected.sum() == num_seats:
-            break
+            round_info.append(RoundResult(counts.tolist(), elected_idx.tolist(), None))
+            return round_info
 
-        losers = np.where(counts[1:] == counts[1:].min())[0] + 1
-        loser = np.random.choice(losers, 1)
+        min_count = counts[1:].min()
+        eliminated = np.where(counts[1:] == min_count)[0] + 1
+        eliminated = np.random.choice(eliminated, 1)
+        ballots[ballots == eliminated] = 0
 
-        ballots[ballots == loser] = 0
+        round_info.append(
+            RoundResult(counts.tolist(), elected_idx.tolist(), eliminated)
+        )
 
-    elected = np.nonzero(elected)[0] + 1
 
-    return elected, counts
+def elected_indices(e):
+    elected_idx = np.nonzero(e)[0] + 1
+    return elected_idx.tolist()
 
 
 def validate_and_standardize_ballots(ballots):
