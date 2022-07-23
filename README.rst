@@ -16,11 +16,6 @@ Single Transferable Vote
         :alt: Documentation Status
 
 
-.. image:: https://pyup.io/repos/github/chrisroat/pystv/shield.svg
-     :target: https://pyup.io/repos/github/chrisroat/pystv/
-     :alt: Security Status
-
-
 Python API for adjudicating single transferable vote elections
 
 
