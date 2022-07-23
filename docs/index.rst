@@ -1,5 +1,5 @@
 Welcome to Single Transferable Vote's documentation!
-======================================
+====================================================
 
 .. toctree::
    :maxdepth: 2
