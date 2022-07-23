@@ -2,7 +2,6 @@
 import numpy as np
 import pytest
 from click.testing import CliRunner
-from numpy.testing import assert_equal, assert_allclose
 
 import pystv
 from pystv import cli

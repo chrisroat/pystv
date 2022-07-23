@@ -1,5 +1,6 @@
 """Minimalist implementation of Single Transferable Vote."""
 import collections
+
 import numpy as np
 
 RoundResult = collections.namedtuple("RoundResults", ["count", "elected", "eliminated"])
